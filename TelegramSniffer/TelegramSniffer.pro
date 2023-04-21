@@ -4,8 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += network
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,14 +13,24 @@ TEMPLATE = app
 
 CONFIG   += c++11
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    ../qcodesysnv.cpp \
+DEFINES += QT_DEPRECATED_WARNINGS
+
+include("../qcodesysnv.pri")
+
+SOURCES += \
+    main.cpp\
+    mainwindow.cpp \
     popup.cpp
 
-HEADERS  += mainwindow.h \
-    ../qcodesysnv.h \
+HEADERS  += \
+    mainwindow.h \
     popup.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
+    mainwindow.ui \
     popup.ui
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target

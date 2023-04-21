@@ -212,7 +212,8 @@ void QCodesysNVSocket::readyRead()
     }
 }
 
-QCodesysNVTelegram::QCodesysNVTelegram(bool broadcastable, QObject *parent)
+QCodesysNVTelegram::QCodesysNVTelegram(bool broadcastable, QObject *parent) :
+    QObject(parent)
 {
     dataUpdated=0;
     this->broadcastable = broadcastable;
@@ -230,7 +231,6 @@ QCodesysNVTelegram::QCodesysNVTelegram(bool broadcastable, QObject *parent)
     counter=0;
     flags=0;
     checksum=0;
-
 }
 
 int QCodesysNVTelegram::setVariableTypes(const QList<QCodesysNVType> &variables)
@@ -651,8 +651,7 @@ int QCodesysNVTelegram::stringToData(QString dataString){
     //qDebug() << "QCodesysNVTelegram::stringToData: List items " << dataList.length() << dataList[0];
     if (variableTypeList.length()>0 && variableTypeList.length() == dataList.length())
     {
-        for(unsigned int i=0;i<variableTypeList.length();i++)
-        {
+        for(int i=0; i<variableTypeList.length(); ++i) {
             stringToDataVar(i,dataList[i]);
         }
     }

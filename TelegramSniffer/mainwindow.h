@@ -103,8 +103,8 @@ private:
     bool heartBeatValue;
 
     //comboBox_rateTime values (indexes) to seconds
-    QVector <int> rateTimeValues;
-    QVector <int> dataloggerTimeValues;
+    QList<int> rateTimeValues;
+    QList<int> dataloggerTimeValues;
 
 
     //counters for different datagramtypes

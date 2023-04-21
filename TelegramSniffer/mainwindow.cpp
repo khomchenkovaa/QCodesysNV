@@ -27,7 +27,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include <iostream>
+
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -38,23 +40,26 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //makes pointers to NULL
     //remember this!
-    socket=NULL;
-    logFile = NULL;
-    logStream = NULL;
-    trafficLogFile = NULL;
-    trafficLogStream = NULL;
-
-    //initializes telegrams
-    receivableTelegram=new QCodesysNVTelegram(0);
-    broadcastableTelegram = new QCodesysNVTelegram(1);
-    //connects update signal of receivableTelegram to dataAvailable() slot of this
-    connect(receivableTelegram,SIGNAL(updated()),this,SLOT(dataAvailable()));
-
+    socket           = Q_NULLPTR;
+    logFile          = Q_NULLPTR;
+    logStream        = Q_NULLPTR;
+    trafficLogFile   = Q_NULLPTR;
+    trafficLogStream = Q_NULLPTR;
 
     //initializes counters
     CODESYScounter=0;
     UDPcounter=0;
     TELEGRAMcounter=0;
+
+    //set values for comboxes of time intervals of data logger and counters
+    rateTimeValues << 1 << 5 << 10 << 60 << 600;
+    dataloggerTimeValues << 1 << 5 << 10 << 60 << 600;
+
+    //initializes telegrams
+    receivableTelegram = new QCodesysNVTelegram(0);
+    broadcastableTelegram = new QCodesysNVTelegram(1);
+    //connects update signal of receivableTelegram to dataAvailable() slot of this
+    connect(receivableTelegram,SIGNAL(updated()),this,SLOT(dataAvailable()));
 
     //initializes timers for counters, datalogger and heart beat
     counterTimer = new QTimer(this);
@@ -70,19 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
     heartBeatTimer->start(ui->spinBox_hearBeatInterval->value());
     heartBeatValue=0;
 
-    //set values for comboxes of time intervals of data logger and counters
-    rateTimeValues.push_back(1);
-    rateTimeValues.push_back(5);
-    rateTimeValues.push_back(10);
-    rateTimeValues.push_back(60);
-    rateTimeValues.push_back(600);
-
-    dataloggerTimeValues.push_back(1);
-    dataloggerTimeValues.push_back(5);
-    dataloggerTimeValues.push_back(10);
-    dataloggerTimeValues.push_back(60);
-    dataloggerTimeValues.push_back(600);
-
     //sets max size of sniffer text box
     ui->plainTextEdit_messageLog->setMaximumBlockCount(500);
 
@@ -90,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete popupWindow;
     delete ui;
 }
 
@@ -330,13 +321,13 @@ void MainWindow::on_checkBox_LogToFile_clicked()
 //sets time interval of counters
 void MainWindow::on_comboBox_rateTime_currentIndexChanged(int index)
 {
-    counterTimer->setInterval(rateTimeValues[ui->comboBox_rateTime->currentIndex()]*1000);
+    counterTimer->setInterval(rateTimeValues[index]*1000);
 }
 
 //sets datalogger timeintervals
 void MainWindow::on_comboBox_dataloggerTimestep_currentIndexChanged(int index)
 {
-    if (ui->comboBox_dataloggerTimestep->currentIndex()==0)
+    if (index == 0)
     {
         dataloggerTimer->stop();
     }
@@ -447,7 +438,7 @@ void MainWindow::on_pushButton_listen_clicked()
     receivableTelegram->setCobId(ui->CobIdBox->value());
     if(receivableTelegram->setVariableTypes(variableText))
     {
-        popupWindow = new PopUp(); // Be sure to destroy you window somewhere
+        popupWindow = new PopUp(this);
         popupWindow->ClearAll();
         popupWindow->SetLabel1("Typo in the variable list!");
         popupWindow->show();
